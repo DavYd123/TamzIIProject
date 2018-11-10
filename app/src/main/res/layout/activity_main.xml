@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingTop="60dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="Pacman"
+        android:textAlignment="center"
+        android:textSize="36sp" />
+
+    <Button
+        android:id="@+id/start"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:onClick="onClick"
+        android:text="Start Game" />
+
+    <Button
+        android:id="@+id/settings"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="Settings" />
+
+    <Button
+        android:id="@+id/score"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:onClick="onClick"
+        android:text="Score" />
+
+    <Button
+        android:id="@+id/about"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:text="About" />
+
+</LinearLayout>
