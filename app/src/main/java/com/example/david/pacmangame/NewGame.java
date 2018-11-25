@@ -9,26 +9,39 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
-public class NewGame extends View
-{
+public class NewGame extends View {
     int width;
     int height;
+
+    // ukazatel skore
+    int score = 0;
+    int life_total = 3;
+
+    // location
+    float x1;
+    float y1;
 
     // velikost levelu
     int x_level = 19;
     int y_level = 17;
 
+    // where is pacman
+    int pacman_position_x = 8;
+    int pacman_position_y = 11;
 
-    public NewGame(Context context)
-    {
+    int meal = 0;
+    int meal2 = 0;
+
+    public NewGame(Context context) {
         super(context);
         init(context);
     }
 
-    public NewGame(Context context, AttributeSet attrs)
-    {
+    public NewGame(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -37,29 +50,28 @@ public class NewGame extends View
 
     private int level1[] =
             {
-                    4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,
-                    4 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,4 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,4 ,
-                    4 ,5 ,4 ,4 ,5 ,4 ,4 ,5 ,4 ,5 ,4 ,4 ,5 ,4 ,4 ,5 ,4 ,
-                    4 ,6 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,6 ,4 ,
-                    4 ,5 ,4 ,4 ,5 ,4 ,5 ,4 ,4 ,4 ,5 ,4 ,5 ,4 ,4 ,5 ,4 ,
-                    4 ,5 ,5 ,5 ,5 ,4 ,5 ,5 ,4 ,5 ,5 ,4 ,5 ,5 ,5 ,5 ,4 ,
-                    4 ,4 ,4 ,4 ,5 ,4 ,4 ,15,4 ,15,4 ,4 ,5 ,4 ,4 ,4 ,4 ,
-                    15,15,15,4 ,5 ,4 ,15,15,14,15,15,4 ,5 ,4 ,15,15,15,
-                    4 ,4 ,4 ,4 ,5 ,4 ,15,4 ,15,4 ,15,4 ,5 ,4 ,4 ,4 ,4 ,
-                    7 ,15,15,15,5 ,15,15,4 ,10,4 ,15,15,5 ,15,15,15,8 ,
-                    4 ,4 ,4 ,4 ,5 ,4 ,15,4 ,4 ,4 ,15,4 ,5 ,4 ,4 ,4 ,4 ,
-                    15,15,15,4 ,5 ,4 ,15,15,0 ,15,15,4 ,5 ,4 ,15,15,15,
-                    4 ,4 ,4 ,4 ,5 ,4 ,15,4 ,4 ,4 ,15,4 ,5 ,4 ,4 ,4 ,4 ,
-                    4 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,4 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,4 ,
-                    4 ,5 ,4 ,4 ,5 ,4 ,4 ,5 ,4 ,5 ,4 ,4 ,5 ,4 ,4 ,5 ,4 ,
-                    4 ,6 ,5 ,4 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,4 ,5 ,6 ,4 ,
-                    4 ,4 ,5 ,4 ,5 ,4 ,4 ,4 ,5 ,4 ,4 ,4 ,5 ,4 ,5 ,4 ,4 ,
-                    4 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,5 ,4 ,
-                    4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,4 ,
+                    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+                    4, 5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 4,
+                    4, 5, 4, 4, 5, 4, 4, 5, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                    4, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4,
+                    4, 5, 4, 4, 5, 4, 5, 4, 4, 4, 5, 4, 5, 4, 4, 5, 4,
+                    4, 5, 5, 5, 5, 4, 5, 5, 4, 5, 5, 4, 5, 5, 5, 5, 4,
+                    4, 4, 4, 4, 5, 4, 4, 15, 4, 15, 4, 4, 5, 4, 4, 4, 4,
+                    15, 15, 15, 4, 5, 4, 15, 15, 14, 15, 15, 4, 5, 4, 15, 15, 15,
+                    4, 4, 4, 4, 5, 4, 15, 4, 15, 4, 15, 4, 5, 4, 4, 4, 4,
+                    7, 15, 15, 15, 5, 15, 15, 4, 10, 4, 15, 15, 5, 15, 15, 15, 8,
+                    4, 4, 4, 4, 5, 4, 15, 4, 4, 4, 15, 4, 5, 4, 4, 4, 4,
+                    15, 15, 15, 4, 5, 4, 15, 15, 0, 15, 15, 4, 5, 4, 15, 15, 15,
+                    4, 4, 4, 4, 5, 4, 15, 4, 4, 4, 15, 4, 5, 4, 4, 4, 4,
+                    4, 5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 4,
+                    4, 5, 4, 4, 5, 4, 4, 5, 4, 5, 4, 4, 5, 4, 4, 5, 4,
+                    4, 6, 5, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 6, 4,
+                    4, 4, 5, 4, 5, 4, 4, 4, 5, 4, 4, 4, 5, 4, 5, 4, 4,
+                    4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4,
+                    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
             };
 
-    void init(Context context)
-    {
+    void init(Context context) {
         bmp = new Bitmap[21];
 
         bmp[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.pacman_right);
@@ -86,8 +98,7 @@ public class NewGame extends View
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh)
-    {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         width = w / y_level;
         height = h / x_level;
         super.onSizeChanged(w, h, oldw, oldh);
@@ -95,7 +106,6 @@ public class NewGame extends View
 
     @Override
     protected void onDraw(Canvas canvas) {
-
         for (int i = 0; i < x_level; i++) {
             for (int j = 0; j < y_level; j++) {
                 canvas.drawBitmap(bmp[level1[i * 17 + j]], null,
@@ -105,8 +115,254 @@ public class NewGame extends View
             // zajisti prekresleni
             // invalidate();
         }
-
-
-
     }
+
+    public boolean onTouchEvent(MotionEvent touchEvent) {
+        switch (touchEvent.getAction()) {
+            // when screen is pushed, get location
+            case MotionEvent.ACTION_DOWN: {
+                x1 = touchEvent.getX();
+                y1 = touchEvent.getY();
+
+                break;
+            }
+
+            case MotionEvent.ACTION_UP:
+                {
+
+                // move right
+                if (x1 > 450 && y1 > 450 && y1 < 800) {
+                    // upravit, jednoduche osetreni aby nemazal steny
+                    if (level1[pacman_position_y * 17 + pacman_position_x + 1] != 4) {
+                        // pokud connector doprava, tak presun ke connectoru vlevo
+                        if (level1[pacman_position_y * 17 + pacman_position_x + 1] == 8) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x - 14] = 0;
+                            pacman_position_x -= 14;
+
+                            invalidate();
+
+                        }
+                        // pokud sezere small meal +5 score a zmeni na prazdne pole
+                        else if (level1[pacman_position_y * 17 + pacman_position_x + 1] == 5) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x + 1] = 0;
+                            pacman_position_x += 1;
+                            score += 5;
+                            meal += 1;
+
+                            invalidate();
+                        }
+                        // pokud sni special meal, +50 score a boostne na 10 premisteni ?
+                        else if (level1[pacman_position_y * 17 + pacman_position_x + 1] == 6) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x + 1] = 16;
+                            pacman_position_x += 1;
+                            score += 50;
+                            meal2 += 1;
+
+                            invalidate();
+                        }
+
+                        // tresen prida +100
+                        else if (level1[pacman_position_y * 17 + pacman_position_x + 1] == 14) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x + 1] = 0;
+                            pacman_position_x += 1;
+                            score += 100;
+
+                            invalidate();
+                        }
+
+                        // pokud se dotkne hrac ducha -1 zivot
+                        else if (level1[pacman_position_y * 17 + pacman_position_x + 1] == 10) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x + 1] = 10;
+                            life_total -= 1;
+
+                            invalidate();
+                        } else {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x + 1] = 0;
+                            pacman_position_x += 1;
+
+                            invalidate();
+                        }
+
+                        // +200 score = +1 life
+                    }
+                }
+
+                // left
+                if (x1 < 450 && y1 > 450 && y1 < 800) {
+                    if (level1[pacman_position_y * 17 + pacman_position_x - 1] != 4) {
+                        // pokud connector doleva, tak presun ke connectoru vpravo
+                        if (level1[pacman_position_y * 17 + pacman_position_x - 1] == 7) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x + 14] = 1;
+                            pacman_position_x += 14;
+
+                            invalidate();
+                        }
+                        // pokud sezere small meal +5 score a zmeni na prazdne pole
+                        else if (level1[pacman_position_y * 17 + pacman_position_x - 1] == 5) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x - 1] = 1;
+                            pacman_position_x -= 1;
+                            score += 5;
+                            meal += 1;
+
+                            invalidate();
+                        }
+                        // pokud sni special meal, +50 score a boostne na 10 premisteni ?
+                        else if (level1[pacman_position_y * 17 + pacman_position_x - 1] == 6) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x - 1] = 17;
+                            pacman_position_x -= 1;
+                            score += 50;
+                            meal2 += 1;
+
+                            invalidate();
+                        }
+
+                        // tresen prida +100
+                        else if (level1[pacman_position_y * 17 + pacman_position_x - 1] == 14) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x - 1] = 1;
+                            pacman_position_x -= 1;
+                            score += 100;
+
+                            invalidate();
+                        }
+
+                        // pokud se dotkne hrac ducha -1 zivot
+                        else if (level1[pacman_position_y * 17 + pacman_position_x - 1] == 10) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x - 1] = 10;
+                            life_total -= 1;
+
+                            invalidate();
+                        } else {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[pacman_position_y * 17 + pacman_position_x - 1] = 1;
+                            pacman_position_x -= 1;
+
+                            invalidate();
+                        }
+                        // +200 score = +1 life
+                    }
+                }
+
+                // up
+                if (y1 < 450) {
+                    if (level1[(pacman_position_y - 1) * 17 + pacman_position_x] != 4) {
+                        // pokud sezere small meal +5 score a zmeni na prazdne pole
+                        if (level1[(pacman_position_y - 1) * 17 + pacman_position_x] == 5) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y - 1) * 17 + pacman_position_x] = 2;
+                            pacman_position_y -= 1;
+                            score += 5;
+                            meal += 1;
+
+                            invalidate();
+                        }
+
+                        // pokud sni special meal, +50 score a boostne na 10 premisteni ?
+                        else if (level1[(pacman_position_y - 1) * 17 + pacman_position_x] == 6) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y - 1) * 17 + pacman_position_x] = 18;
+                            pacman_position_y -= 1;
+                            score += 50;
+                            meal2 += 1;
+
+                            invalidate();
+                        }
+
+                        // tresen prida +100
+                        else if (level1[(pacman_position_y - 1) * 17 + pacman_position_x] == 14) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y - 1) * 17 + pacman_position_x] = 2;
+                            pacman_position_y -= 1;
+                            score += 100;
+
+                            invalidate();
+                        }
+
+                        // pokud se dotkne hrac ducha -1 zivot
+                        else if (level1[(pacman_position_y - 1) * 17 + pacman_position_x] == 10) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y - 1) * 17 + pacman_position_x] = 10;
+                            pacman_position_y -= 1;
+                            life_total -= 1;
+
+                            invalidate();
+                        } else {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y - 1) * 17 + pacman_position_x] = 2;
+                            pacman_position_y -= 1;
+
+                            invalidate();
+                        }
+                    }
+                }
+
+                // down
+                if (y1 > 800) {
+                    if (level1[(pacman_position_y + 1) * 17 + pacman_position_x] != 4) {
+                        // pokud sezere small meal +5 score a zmeni na prazdne pole
+                        if (level1[(pacman_position_y + 1) * 17 + pacman_position_x] == 5) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y + 1) * 17 + pacman_position_x] = 3;
+                            pacman_position_y += 1;
+                            score += 5;
+                            meal += 1;
+
+                            invalidate();
+                        }
+
+                        // pokud sni special meal, +50 score a boostne na 10 premisteni ?
+                        else if (level1[(pacman_position_y + 1) * 17 + pacman_position_x] == 6) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y + 1) * 17 + pacman_position_x] = 19;
+                            pacman_position_y += 1;
+                            score += 50;
+                            meal2 += 1;
+
+                            invalidate();
+                        }
+
+                        // tresen prida +100
+                        else if (level1[(pacman_position_y + 1) * 17 + pacman_position_x] == 14) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y + 1) * 17 + pacman_position_x] = 3;
+                            pacman_position_y += 1;
+                            score += 100;
+
+                            invalidate();
+                        }
+
+                        // pokud se dotkne hrac ducha -1 zivot
+                        else if (level1[(pacman_position_y + 1) * 17 + pacman_position_x] == 10) {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y + 1) * 17 + pacman_position_x] = 10;
+                            pacman_position_y += 1;
+                            life_total -= 1;
+
+                            invalidate();
+                        } else {
+                            level1[pacman_position_y * 17 + pacman_position_x] = 15;
+                            level1[(pacman_position_y + 1) * 17 + pacman_position_x] = 3;
+                            pacman_position_y += 1;
+
+                            invalidate();
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+
 }
