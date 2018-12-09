@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -107,6 +108,9 @@ public class NewGame extends View
 
     // pomocna pro osetreni vyhry
     int temp = 0;
+
+    static String score22[];
+    static String finalni;
 
     void init(Context context)
     {
@@ -228,13 +232,27 @@ public class NewGame extends View
 
     private void saveScore()
     {
+        /*
         // name for preference = IDvalue, value = 0
         SharedPreferences mPrefs = this.getContext().getSharedPreferences("IDvalue", 0);
         SharedPreferences.Editor editor = mPrefs.edit();
         // give key value = 1, and putting highscore with this key value
         editor.putInt("1", score);
-        editor.commit();
-    }
+        editor.commit();*/
+
+        DatabaseHandler db = new DatabaseHandler((Activity)getContext());
+        db.addScore(score);
+
+        /*
+        score22 = db.getAllScores();
+
+        for (int i = 0; i < score22.length; i++)
+        {
+            finalni = finalni + "\n" + score22[i];
+        }
+
+        Log.d("this is my array", "arr: " + finalni);*/
+}
 
     public int validateEndGame(int temp)
     {
@@ -792,7 +810,6 @@ public class NewGame extends View
                 }
             }
         }
-
         return true;
     }
 }
