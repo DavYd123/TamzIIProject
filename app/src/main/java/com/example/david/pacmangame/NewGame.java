@@ -14,6 +14,10 @@ import android.view.View;
 import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Random;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class NewGame extends View
 {
@@ -21,8 +25,8 @@ public class NewGame extends View
     int height;
 
     // ukazatel skore
-    int score = 0;
-    int life_total = 3;
+    static int score = 0;
+    static int life_total = 3;
 
     // location
     float x1;
@@ -33,11 +37,8 @@ public class NewGame extends View
     int y_level = 17;
 
     // where is pacman
-    int pacman_position_x = 8;
-    int pacman_position_y = 11;
-
-    int meal = 0;
-    int meal2 = 0;
+    static int pacman_position_x = 8;
+    static int pacman_position_y = 11;
 
     public NewGame(Context context)
     {
@@ -58,11 +59,11 @@ public class NewGame extends View
                     4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
                     4, 5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 4,
                     4, 5, 4, 4, 5, 4, 4, 5, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                    4, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4,
+                    4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4,
                     4, 5, 4, 4, 5, 4, 5, 4, 4, 4, 5, 4, 5, 4, 4, 5, 4,
                     4, 5, 5, 5, 5, 4, 5, 5, 4, 5, 5, 4, 5, 5, 5, 5, 4,
                     4, 4, 4, 4, 5, 4, 4, 15, 4, 15, 4, 4, 5, 4, 4, 4, 4,
-                    15, 15, 15, 4, 5, 4, 15, 15, 14, 15, 15, 4, 5, 4, 15, 15, 15,
+                    15, 15, 15, 4, 5, 4, 15, 15, 15, 15, 15, 4, 5, 4, 15, 15, 15,
                     4, 4, 4, 4, 5, 4, 15, 4, 15, 4, 15, 4, 5, 4, 4, 4, 4,
                     7, 15, 15, 15, 5, 15, 15, 4, 10, 4, 15, 15, 5, 15, 15, 15, 8,
                     4, 4, 4, 4, 5, 4, 15, 4, 4, 4, 15, 4, 5, 4, 4, 4, 4,
@@ -70,7 +71,7 @@ public class NewGame extends View
                     4, 4, 4, 4, 5, 4, 15, 4, 4, 4, 15, 4, 5, 4, 4, 4, 4,
                     4, 5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 4,
                     4, 5, 4, 4, 5, 4, 4, 5, 4, 5, 4, 4, 5, 4, 4, 5, 4,
-                    4, 6, 5, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 6, 4,
+                    4, 5, 5, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 4,
                     4, 4, 5, 4, 5, 4, 4, 4, 5, 4, 4, 4, 5, 4, 5, 4, 4,
                     4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4,
                     4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
@@ -84,6 +85,28 @@ public class NewGame extends View
 
     public static int[] mapa1;
     public static int[] mapa2;
+
+    // random generator
+    Random rand = new Random();
+
+    // position of ghost
+    static int ghost_x = 8;
+    static int ghost_y = 9;
+
+    // delay movement
+    int x;
+
+    // starting movement up
+    int n;
+
+    // temp for memory of array
+    int temp0 = 0;
+    int temp1 = 0;
+    int temp2 = 0;
+    int temp3 = 0;
+
+    // pomocna pro osetreni vyhry
+    int temp = 0;
 
     void init(Context context)
     {
@@ -162,6 +185,16 @@ public class NewGame extends View
             level1[195] = 15;
         }
 
+        pacman_position_x = 8;
+        pacman_position_y = 11;
+
+        ghost_x = 8;
+        ghost_y = 9;
+
+        level1[pacman_position_y * 17 + pacman_position_x ] = 0;
+
+        life_total = 3;
+        score = 0;
         Log.d("this is my array", "arr: " + level1);
         Log.d("this is my array", "arr: " + mapa1);
     }
@@ -178,23 +211,29 @@ public class NewGame extends View
             level1[195] = 15;
         }
 
-        Log.d("this is my array", "arr: " + level1);
-        Log.d("this is my array", "arr: " + mapa2);
+        pacman_position_x = 8;
+        pacman_position_y = 11;
+
+        ghost_x = 8;
+        ghost_y = 9;
+
+        level1[pacman_position_y * 17 + pacman_position_x] = 0;
+
+        life_total = 3;
+        score = 0;
+        //Log.d("this is my array", "arr: " + level1);
+        // Log.d("this is my array", "arr: " + mapa2);
     }
 
 
     private void saveScore()
     {
-        //get text view
-        TextView scoreView1 = (TextView) ((Activity)getContext()).findViewById(R.id.scoreView);
-        //get shared prefs
-        SharedPreferences scorePrefs = this.getContext().getSharedPreferences("Prefs", Context.MODE_PRIVATE);
-        //get scores
-        //int savedScores = scorePrefs.getInt("1", score);
-
-        Log.d("this is my array", "arr: " + scorePrefs);
-        //display scores
-        //scoreView1.setText(savedScores);
+        // name for preference = IDvalue, value = 0
+        SharedPreferences mPrefs = this.getContext().getSharedPreferences("IDvalue", 0);
+        SharedPreferences.Editor editor = mPrefs.edit();
+        // give key value = 1, and putting highscore with this key value
+        editor.putInt("1", score);
+        editor.commit();
     }
 
     public int validateEndGame(int temp)
@@ -207,7 +246,6 @@ public class NewGame extends View
                 temp += 1;
             }
         }
-
         return temp;
     }
 
@@ -225,7 +263,7 @@ public class NewGame extends View
         try
         {
             loadLevels();
-            Log.d("this is my array", "arr: " + level2);
+            //Log.d("this is my array", "arr: " + level2);
         }
         catch (IOException e)
         {
@@ -236,13 +274,6 @@ public class NewGame extends View
         if (life_total == 0)
         {
             saveScore();
-
-            System.exit(0);
-        }
-
-        // vyhrana hra
-        if (meal == 116 && meal2 == 4)
-        {
             System.exit(0);
         }
 
@@ -261,6 +292,252 @@ public class NewGame extends View
             TextView lifes = (TextView) ((Activity)getContext()).findViewById(R.id.lives1);
             lifes.setText(Integer.toString(life_total));
         }
+
+        // n = rand.nextInt(4);
+
+        // Log.d("this is my array", "arr: " + n);
+
+        for (int i = 0; i < level1.length; i ++)
+        {
+            if(level1[i] == 5 || level1[i] == 6)
+            {
+                temp += 1;
+            }
+        }
+
+        if(temp == 0)
+        {
+            saveScore();
+            System.exit(0);
+        }
+
+       // Log.d("temp", "arr: " + temp);
+
+        temp = 0;
+
+        // move ghost up
+        // delay movement
+        if(x == 5)
+        {
+            if (n == 0)
+            {
+                // 4 stena, 5 meal, 15 empty
+                // kdyz je misto volne a pomocna 0
+                if (level1[(ghost_y - 1) * 17 + ghost_x] == 15 && temp0 == 0)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 15;
+                    level1[(ghost_y - 1) * 17 + ghost_x] = 10;
+                    ghost_y -= 1;
+                }
+                // kdyz je misto volne a pomocna 1, tak vykresli meal na puvodni
+                else if (level1[(ghost_y - 1) * 17 + ghost_x] == 15 && temp0 == 1)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[(ghost_y - 1) * 17 + ghost_x] = 10;
+                    ghost_y -= 1;
+                    temp0 = 0;
+                }
+                // misto je meal a pomocna 0
+                else if (level1[(ghost_y - 1) * 17 + ghost_x] == 5 && temp0 == 0)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[(ghost_y - 1) * 17 + ghost_x] = 10;
+                    ghost_y -= 1;
+                    temp0++;
+                }
+                // misto je meal a pomocna 1, vykresli meal na puvodni
+                else if (level1[(ghost_y - 1) * 17 + ghost_x] == 5 && temp0 == 1)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[(ghost_y - 1) * 17 + ghost_x] = 10;
+                    ghost_y -= 1;
+                    temp0 = 0;
+                }
+                // dotknuti pacmana
+                else if (level1[(ghost_y - 1) * 17 + ghost_x] == 0 || level1[(ghost_y - 1) * 17 + ghost_x] == 1 || level1[(ghost_y - 1) * 17 + ghost_x] == 2 || level1[(ghost_y - 1) * 17 + ghost_x] == 3)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 15;
+                    level1[(ghost_y - 1) * 17 + ghost_x] = 10;
+                    ghost_y -= 1;
+                    life_total -= 1;
+                    pacman_position_x = 8;
+                    pacman_position_y = 11;
+                    level1[pacman_position_y * 17 + pacman_position_x] = 0;
+                }
+
+                invalidate();
+            }
+
+            // move ghost down
+            if (n == 1)
+            {
+                // volno a pomocna 0
+                if (level1[(ghost_y + 1) * 17 + ghost_x] == 15 && temp1 == 0)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 15;
+                    level1[(ghost_y + 1) * 17 + ghost_x] = 10;
+                    ghost_y += 1;
+                }
+                // volno a pomocna 1
+                else if (level1[(ghost_y + 1) * 17 + ghost_x] == 15 && temp1 == 1)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[(ghost_y + 1) * 17 + ghost_x] = 10;
+                    ghost_y += 1;
+                    temp1 = 0;
+                }
+                // meal a pom 0
+                else if (level1[(ghost_y + 1) * 17 + ghost_x] == 5 && temp1 == 0)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[(ghost_y + 1) * 17 + ghost_x] = 10;
+                    ghost_y += 1;
+                    temp1++;
+                }
+                // meal a pom 1
+                else if (level1[(ghost_y + 1) * 17 + ghost_x] == 5 && temp1 == 1)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[(ghost_y + 1) * 17 + ghost_x] = 10;
+                    ghost_y += 1;
+                    temp1 = 0;
+                }
+
+                else if (level1[(ghost_y + 1) * 17 + ghost_x] == 0 || level1[(ghost_y + 1) * 17 + ghost_x] == 1 || level1[(ghost_y + 1) * 17 + ghost_x] == 2 || level1[(ghost_y + 1) * 17 + ghost_x] == 3)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[(ghost_y + 1) * 17 + ghost_x] = 10;
+                    ghost_y += 1;
+                    life_total -= 1;
+                    pacman_position_x = 8;
+                    pacman_position_y = 11;
+                    level1[pacman_position_y * 17 + pacman_position_x] = 0;
+                }
+
+                invalidate();
+            }
+
+
+            // move ghost left
+            if (n == 2)
+            {
+                // volno a pom 0
+                if (level1[ghost_y * 17 + ghost_x - 1] == 15 && temp2 == 0)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 15;
+                    level1[ghost_y * 17 + ghost_x - 1] = 10;
+                    ghost_x -= 1;
+                }
+                // volno a pom 1
+                else if (level1[ghost_y * 17 + ghost_x - 1] == 15 && temp2 == 1)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[ghost_y * 17 + ghost_x - 1] = 10;
+                    ghost_x -= 1;
+                    temp2 = 0;
+                }
+                // meal a pom 0
+                else if (level1[ghost_y * 17 + ghost_x - 1] == 5 && temp2 == 0)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[ghost_y * 17 + ghost_x - 1] = 10;
+                    ghost_x -= 1;
+                    temp2++;
+                }
+                // meal a pom 1
+                else if (level1[ghost_y * 17 + ghost_x - 1] == 5 && temp2 == 1)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[ghost_y * 17 + ghost_x - 1] = 10;
+                    ghost_x -= 1;
+                    temp2 = 0;
+                }
+
+                else if (level1[ghost_y * 17 + ghost_x - 1] == 0 || level1[ghost_y * 17 + ghost_x - 1] == 1 || level1[ghost_y * 17 + ghost_x - 1] == 2 || level1[ghost_y * 17 + ghost_x - 1] == 3)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[ghost_y * 17 + ghost_x - 1] = 10;
+                    ghost_x -= 1;
+                    life_total -= 1;
+                    pacman_position_x = 8;
+                    pacman_position_y = 11;
+                    level1[pacman_position_y * 17 + pacman_position_x] = 0;
+                }
+
+                else if (level1[ghost_y * 17 + ghost_x - 1] == 7)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 15;
+                    level1[ghost_y * 17 + ghost_x + 14] = 10;
+                    ghost_x += 14;
+                }
+
+                invalidate();
+            }
+
+
+            // move ghost right
+            if (n == 3) {
+                // volno a 0
+                if (level1[ghost_y * 17 + ghost_x + 1] == 15 && temp3 == 0)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 15;
+                    level1[ghost_y * 17 + ghost_x + 1] = 10;
+                    ghost_x += 1;
+                }
+                // volno a 1
+                else if (level1[ghost_y * 17 + ghost_x + 1] == 15 && temp3 == 1)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[ghost_y * 17 + ghost_x + 1] = 10;
+                    ghost_x += 1;
+                    temp3 = 0;
+                }
+                // meal a 0
+                else if (level1[ghost_y * 17 + ghost_x + 1] == 5 && temp3 == 0)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[ghost_y * 17 + ghost_x + 1] = 10;
+                    ghost_x += 1;
+                    temp3++;
+                }
+                // meal a 1
+                else if (level1[ghost_y * 17 + ghost_x + 1] == 5 && temp3 == 1)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[ghost_y * 17 + ghost_x + 1] = 10;
+                    ghost_x += 1;
+                    temp3 = 0;
+                }
+
+                else if (level1[ghost_y * 17 + ghost_x + 1] == 0 || level1[ghost_y * 17 + ghost_x + 1] == 1 || level1[ghost_y * 17 + ghost_x + 1] == 2 || level1[ghost_y * 17 + ghost_x + 1] == 3)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 5;
+                    level1[ghost_y * 17 + ghost_x + 1] = 10;
+                    ghost_x += 1;
+                    life_total -= 1;
+                    pacman_position_x = 8;
+                    pacman_position_y = 11;
+                    level1[pacman_position_y * 17 + pacman_position_x] = 0;
+                }
+
+                else if (level1[ghost_y * 17 + ghost_x + 1] == 8)
+                {
+                    level1[ghost_y * 17 + ghost_x] = 15;
+                    level1[ghost_y * 17 + ghost_x - 14] = 10;
+                    ghost_x -= 14;
+                }
+
+                invalidate();
+            }
+
+            x = 0;
+        }
+
+        x++;
+
+        invalidate();
+
+       // Log.d("my x", "arr: " + x);
     }
 
     public boolean onTouchEvent(MotionEvent touchEvent)
@@ -272,6 +549,8 @@ public class NewGame extends View
                 {
                 x1 = touchEvent.getX();
                 y1 = touchEvent.getY();
+
+                n = rand.nextInt(4);
 
                 break;
             }
@@ -297,7 +576,6 @@ public class NewGame extends View
                             level1[pacman_position_y * 17 + pacman_position_x + 1] = 0;
                             pacman_position_x += 1;
                             score += 5;
-                            meal += 1;
 
                             invalidate();
                         }
@@ -307,7 +585,6 @@ public class NewGame extends View
                             level1[pacman_position_y * 17 + pacman_position_x + 1] = 16;
                             pacman_position_x += 1;
                             score += 50;
-                            meal2 += 1;
 
                             invalidate();
                         }
@@ -323,11 +600,14 @@ public class NewGame extends View
                         }
 
                         // pokud se dotkne hrac ducha -1 zivot
-                        else if (level1[pacman_position_y * 17 + pacman_position_x + 1] == 10) {
+                        else if (level1[pacman_position_y * 17 + pacman_position_x + 1] == 10)
+                        {
                             level1[pacman_position_y * 17 + pacman_position_x] = 15;
                             level1[pacman_position_y * 17 + pacman_position_x + 1] = 10;
                             life_total -= 1;
-
+                            pacman_position_x = 8;
+                            pacman_position_y = 11;
+                            level1[pacman_position_y * 17 + pacman_position_x] = 0;
                             invalidate();
                         } else {
                             level1[pacman_position_y * 17 + pacman_position_x] = 15;
@@ -342,6 +622,7 @@ public class NewGame extends View
                 }
 
                 // left
+                    // if(x1 - y1 > SWIPE_MIN_DISTANCE && Math.abs(10) >     SWIPE_THRESHOLD_VELOCITY)
                 if (x1 < 450 && y1 > 450 && y1 < 800) {
                     if (level1[pacman_position_y * 17 + pacman_position_x - 1] != 4) {
                         // pokud connector doleva, tak presun ke connectoru vpravo
@@ -358,7 +639,6 @@ public class NewGame extends View
                             level1[pacman_position_y * 17 + pacman_position_x - 1] = 1;
                             pacman_position_x -= 1;
                             score += 5;
-                            meal += 1;
 
                             invalidate();
                         }
@@ -368,7 +648,6 @@ public class NewGame extends View
                             level1[pacman_position_y * 17 + pacman_position_x - 1] = 17;
                             pacman_position_x -= 1;
                             score += 50;
-                            meal2 += 1;
 
                             invalidate();
                         }
@@ -388,9 +667,13 @@ public class NewGame extends View
                             level1[pacman_position_y * 17 + pacman_position_x] = 15;
                             level1[pacman_position_y * 17 + pacman_position_x - 1] = 10;
                             life_total -= 1;
-
+                            pacman_position_x = 8;
+                            pacman_position_y = 11;
+                            level1[pacman_position_y * 17 + pacman_position_x] = 0;
                             invalidate();
-                        } else {
+                        }
+                        else
+                            {
                             level1[pacman_position_y * 17 + pacman_position_x] = 15;
                             level1[pacman_position_y * 17 + pacman_position_x - 1] = 1;
                             pacman_position_x -= 1;
@@ -410,7 +693,6 @@ public class NewGame extends View
                             level1[(pacman_position_y - 1) * 17 + pacman_position_x] = 2;
                             pacman_position_y -= 1;
                             score += 5;
-                            meal += 1;
 
                             invalidate();
                         }
@@ -421,7 +703,6 @@ public class NewGame extends View
                             level1[(pacman_position_y - 1) * 17 + pacman_position_x] = 18;
                             pacman_position_y -= 1;
                             score += 50;
-                            meal2 += 1;
 
                             invalidate();
                         }
@@ -442,7 +723,9 @@ public class NewGame extends View
                             level1[(pacman_position_y - 1) * 17 + pacman_position_x] = 10;
                             pacman_position_y -= 1;
                             life_total -= 1;
-
+                            pacman_position_x = 8;
+                            pacman_position_y = 11;
+                            level1[pacman_position_y * 17 + pacman_position_x] = 0;
                             invalidate();
                         } else {
                             level1[pacman_position_y * 17 + pacman_position_x] = 15;
@@ -463,7 +746,6 @@ public class NewGame extends View
                             level1[(pacman_position_y + 1) * 17 + pacman_position_x] = 3;
                             pacman_position_y += 1;
                             score += 5;
-                            meal += 1;
 
                             invalidate();
                         }
@@ -474,7 +756,6 @@ public class NewGame extends View
                             level1[(pacman_position_y + 1) * 17 + pacman_position_x] = 19;
                             pacman_position_y += 1;
                             score += 50;
-                            meal2 += 1;
 
                             invalidate();
                         }
@@ -497,7 +778,7 @@ public class NewGame extends View
                             pacman_position_y = 11;
                             pacman_position_x = 8;
                             level1[pacman_position_y * 17 + pacman_position_x] = 0;
-                            life_total -= 3;
+                            life_total -= 1;
 
                             invalidate();
                         } else {

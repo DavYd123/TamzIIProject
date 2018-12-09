@@ -12,6 +12,6 @@
 
         <item
             android:id="@+id/three"
-            android:title="Reset"/>
+            android:title="Exit" />
 
     </menu>

@@ -50,6 +50,9 @@ public class Game extends Activity
                                 ).show();
                                 switchLevel2();
                                 return true;
+                            case R.id.three:
+                                System.exit(0);
+                                return true;
                             default:
                                 return false;
                         }
