@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.example.david.pacmangame.Settings.diff;
 
 public class NewGame extends View
 {
@@ -112,6 +114,8 @@ public class NewGame extends View
     static String score22[];
     static String finalni;
 
+    static int difficulty = 15;
+
     void init(Context context)
     {
         bmp = new Bitmap[21];
@@ -176,6 +180,9 @@ public class NewGame extends View
             throw new Error("Level load failed");
         }
     }
+
+    SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+    int score2 = mPrefs.getInt("1", diff);
 
     public static void switchLevel1()
     {
@@ -335,7 +342,7 @@ public class NewGame extends View
 
         // move ghost up
         // delay movement
-        if(x == 5)
+        if(x == score2)
         {
             if (n == 0)
             {
