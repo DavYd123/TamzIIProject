@@ -35,7 +35,7 @@ public class Settings extends Activity
         {
             public void onClick(View v)
             {
-                diff = 15;
+                diff = 10;
 
                 SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor editor = mPrefs.edit();
@@ -63,7 +63,7 @@ public class Settings extends Activity
             }
         });
 
-        View insane = findViewById(R.id.button2);
+        View insane = findViewById(R.id.button3);
 
         insane.setOnClickListener(new View.OnClickListener()
         {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -44,6 +45,8 @@ public class Score extends Activity
         int score2 = mPrefs.getInt("1", score);*/
 
         TextView scoreView = (TextView) findViewById(R.id.scoreView);
+
+        scoreView.setMovementMethod(new ScrollingMovementMethod());
 
         DatabaseHandler db = new DatabaseHandler(this);
 
